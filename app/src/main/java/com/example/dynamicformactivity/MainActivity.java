@@ -106,9 +106,12 @@ public class MainActivity extends AppCompatActivity implements CustomImageWidget
                 case AppConstants.FORM_ELEMENT_COMMENT:
                     CommentWidget commentWidget = createCommentWidget(formItem);
                     dynamicFormView.addView(commentWidget);
-                    if(inputViewModel.getCommentInput(formItem.getFormItemID()) != null && !inputViewModel.getCommentInput(formItem.getFormItemID()).isEmpty()) {
-                        commentWidget.setCommentsGiven(inputViewModel.getCommentInput(formItem.getFormItemID()));
-                    }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            commentWidget.setCommentsGiven(inputViewModel.getCommentInput(formItem.getFormItemID()));
+                        }
+                    });
                     break;
             }
         }

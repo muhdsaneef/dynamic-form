@@ -5,6 +5,7 @@ import android.content.res.Configuration;
 import android.os.Parcelable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,7 +66,7 @@ public class CommentWidget extends LinearLayout {
     }
 
     public void setCommentsGiven(String commentsGiven) {
-        edtComments.setText(commentsGiven);
+        //edtComments.setText(commentsGiven);
         boolean isEnabled = commentsGiven != null && !commentsGiven.isEmpty();
         edtComments.setVisibility(isEnabled ? VISIBLE : GONE);
         swComments.setChecked(isEnabled);
