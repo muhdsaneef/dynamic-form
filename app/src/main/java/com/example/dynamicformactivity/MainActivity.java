@@ -106,6 +106,9 @@ public class MainActivity extends AppCompatActivity implements CustomImageWidget
                 case AppConstants.FORM_ELEMENT_COMMENT:
                     CommentWidget commentWidget = createCommentWidget(formItem);
                     dynamicFormView.addView(commentWidget);
+                    if(inputViewModel.getCommentInput(formItem.getFormItemID()) != null && !inputViewModel.getCommentInput(formItem.getFormItemID()).isEmpty()) {
+                        commentWidget.setCommentsGiven(inputViewModel.getCommentInput(formItem.getFormItemID()));
+                    }
                     break;
             }
         }
@@ -136,9 +139,6 @@ public class MainActivity extends AppCompatActivity implements CustomImageWidget
         CommentWidget commentWidget = new CommentWidget(this);
         commentWidget.setCommentWidgetTitle(formItem.getFormItemtTitle());
         commentWidget.setCommentID(formItem.getFormItemID());
-        if(inputViewModel.getCommentInput(formItem.getFormItemID()) != null && !inputViewModel.getCommentInput(formItem.getFormItemID()).isEmpty()) {
-            commentWidget.setCommentsGiven(inputViewModel.getCommentInput(formItem.getFormItemID()));
-        }
         commentWidget.setCommentSectionListener(this);
         return commentWidget;
     }

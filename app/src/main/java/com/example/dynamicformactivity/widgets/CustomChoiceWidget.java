@@ -54,7 +54,6 @@ public class CustomChoiceWidget extends LinearLayout {
                 RadioButton radioButton = optionsGroup.findViewById(group.getCheckedRadioButtonId());
                 choiceSelectionListener.onChoiceSelected(choiceID, radioButton.getText().toString());
                 selectedChoice = radioButton.getText().toString();
-
             }
         });
     }
@@ -68,17 +67,18 @@ public class CustomChoiceWidget extends LinearLayout {
     }
 
     public void setChoiceLabels(Context context, List<String> userOptions) {
+        int selectedIndex = -1;
         for(int i = 0; i < userOptions.size(); i++) {
-            int j = -1;
             RadioButton radioButton = new RadioButton(context);
             radioButton.setText(userOptions.get(i));
             if(userOptions.get(i).equalsIgnoreCase(selectedChoice)) {
-                j = i;
+                selectedIndex = i;
             }
             optionsGroup.addView(radioButton);
-            if(j != -1) {
-                optionsGroup.check(j);
-            }
+        }
+        if(selectedIndex != -1) {
+            RadioButton radioButton = (RadioButton) optionsGroup.getChildAt(selectedIndex);
+            radioButton.setChecked(true);
         }
     }
 
