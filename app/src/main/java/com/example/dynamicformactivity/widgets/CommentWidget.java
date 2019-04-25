@@ -1,20 +1,15 @@
 package com.example.dynamicformactivity.widgets;
 
 import android.content.Context;
-import android.content.res.Configuration;
-import android.os.Parcelable;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
-
-import androidx.annotation.Nullable;
 
 import com.example.dynamicformactivity.R;
 
@@ -44,6 +39,7 @@ public class CommentWidget extends LinearLayout {
         swComments = commentWidgetLayout.findViewById(R.id.sw_comment);
         edtComments = commentWidgetLayout.findViewById(R.id.edt_comments);
         tvCommentWidgetTitle = commentWidgetLayout.findViewById(R.id.tv_comment_title);
+        edtComments.setFreezesText(false);
         addView(commentWidgetLayout);
 
         initListeners();
@@ -55,24 +51,50 @@ public class CommentWidget extends LinearLayout {
     }
 
     private void initListeners() {
-        swComments.setOnCheckedChangeListener((buttonView, isChecked) -> edtComments.setVisibility(isChecked ? VISIBLE : GONE));
-
-        edtComments.setOnKeyListener((v, keyCode, event) -> {
+        swComments.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            edtComments.setVisibility(isChecked ? VISIBLE : GONE);
             if(commentSectionListener != null) {
-                commentSectionListener.onCommentChanged(commentID, edtComments.getText().toString().trim());
+                commentSectionListener.onCommentEnabled(commentID, isChecked);
             }
-            return false;
         });
+
+        edtComments.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(commentSectionListener != null) {
+                    commentSectionListener.onCommentChanged(commentID, edtComments.getText().toString().trim());
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
     }
 
     public void setCommentsGiven(String commentsGiven) {
-        //edtComments.setText(commentsGiven);
-        boolean isEnabled = commentsGiven != null && !commentsGiven.isEmpty();
-        edtComments.setVisibility(isEnabled ? VISIBLE : GONE);
-        swComments.setChecked(isEnabled);
+        new Handler().post(() -> {
+            edtComments.setText(commentsGiven);
+        });
+    }
+
+    public void setSectionEnabled(boolean isEnabled){
+        new Handler().post(() -> {
+            edtComments.setVisibility(isEnabled ? VISIBLE : GONE);
+            swComments.setChecked(isEnabled);
+        });
     }
 
     public interface CommentSectionListener {
         void onCommentChanged(String commentID, String comment);
+
+        void onCommentEnabled(String commentID, boolean isEnabled);
     }
 }

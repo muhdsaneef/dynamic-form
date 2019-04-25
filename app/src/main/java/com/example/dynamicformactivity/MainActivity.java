@@ -5,10 +5,8 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,13 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.ViewModelProviders;
-
 import com.example.dynamicformactivity.app.AppConstants;
 import com.example.dynamicformactivity.models.FormItem;
 import com.example.dynamicformactivity.utils.AppUtils;
@@ -37,8 +28,14 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProviders;
 
 public class MainActivity extends AppCompatActivity implements CustomImageWidget.ImageClickListener, CustomChoiceWidget.ChoiceSelectionListener, CommentWidget.CommentSectionListener {
 
@@ -51,18 +48,6 @@ public class MainActivity extends AppCompatActivity implements CustomImageWidget
     private List<FormItem> formItemList;
     private CustomImageWidget selectedImageView;
     private UserInputViewModel inputViewModel;
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        inputViewModel.setImmutable(true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        inputViewModel.setImmutable(false);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,12 +91,6 @@ public class MainActivity extends AppCompatActivity implements CustomImageWidget
                 case AppConstants.FORM_ELEMENT_COMMENT:
                     CommentWidget commentWidget = createCommentWidget(formItem);
                     dynamicFormView.addView(commentWidget);
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            commentWidget.setCommentsGiven(inputViewModel.getCommentInput(formItem.getFormItemID()));
-                        }
-                    });
                     break;
             }
         }
@@ -142,6 +121,12 @@ public class MainActivity extends AppCompatActivity implements CustomImageWidget
         CommentWidget commentWidget = new CommentWidget(this);
         commentWidget.setCommentWidgetTitle(formItem.getFormItemtTitle());
         commentWidget.setCommentID(formItem.getFormItemID());
+        String commentsGiven = inputViewModel.getCommentInput(formItem.getFormItemID());
+        commentWidget.setCommentsGiven(commentsGiven);
+        Boolean isSectionEnabled = inputViewModel.getCommentSectionEnabled(formItem.getFormItemID());
+        if(isSectionEnabled != null) {
+            commentWidget.setSectionEnabled(isSectionEnabled);
+        }
         commentWidget.setCommentSectionListener(this);
         return commentWidget;
     }
@@ -204,6 +189,11 @@ public class MainActivity extends AppCompatActivity implements CustomImageWidget
     }
 
     @Override
+    public void onImageCleared(String imageID) {
+        inputViewModel.setImageBitmap(imageID, null);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
@@ -230,8 +220,11 @@ public class MainActivity extends AppCompatActivity implements CustomImageWidget
 
     @Override
     public void onCommentChanged(String commentID, String comment) {
-        if(comment != null && !comment.isEmpty()) {
-            inputViewModel.setCommentInput(commentID, comment);
-        }
+        inputViewModel.setCommentInput(commentID, comment);
+    }
+
+    @Override
+    public void onCommentEnabled(String commentID, boolean isEnabled) {
+        inputViewModel.setCommentSectionEnabled(commentID, isEnabled);
     }
 }

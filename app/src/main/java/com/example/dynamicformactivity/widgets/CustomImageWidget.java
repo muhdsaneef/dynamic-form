@@ -9,9 +9,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-
 import com.example.dynamicformactivity.R;
+
+import androidx.annotation.Nullable;
 
 public class CustomImageWidget extends LinearLayout {
 
@@ -69,6 +69,10 @@ public class CustomImageWidget extends LinearLayout {
                 selectedBitmap = null;
                 imgSelectedImage.setImageBitmap(null);
                 imgDelete.setVisibility(GONE);
+
+                if(imageClickListener != null) {
+                    imageClickListener.onImageCleared(imageID);
+                }
             }
         });
     }
@@ -95,5 +99,7 @@ public class CustomImageWidget extends LinearLayout {
         void formImageClicked(CustomImageWidget imageView);
 
         void showEnlargedImage(Bitmap selectedBitmap);
+
+        void onImageCleared(String imageID);
     }
 }

@@ -2,33 +2,25 @@ package com.example.dynamicformactivity;
 
 import android.graphics.Bitmap;
 
-import androidx.lifecycle.ViewModel;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import androidx.lifecycle.ViewModel;
 
 class UserInputViewModel extends ViewModel {
 
     private Map<String, Bitmap> imageSelections;
     private Map<String, String> commentSections;
+    private Map<String, Boolean> commentSectionEnabled;
     private Map<String, String> choiceSelections;
-    private boolean isImmutable;
 
     void setCommentInput(String commentID, String comments) {
         if(commentSections == null) {
             commentSections = new HashMap<>();
         }
-        if(comments != null && !comments.isEmpty() && !isImmutable) {
+        if(comments != null) {
             commentSections.put(commentID, comments);
         }
-    }
-
-    public boolean isImmutable() {
-        return isImmutable;
-    }
-
-    public void setImmutable(boolean immutable) {
-        isImmutable = immutable;
     }
 
     void setChoiceSelection(String choiceID, String choice) {
@@ -46,6 +38,20 @@ class UserInputViewModel extends ViewModel {
         return choiceSelections.get(choiceID);
     }
 
+    void setCommentSectionEnabled(String commentID, boolean isEnabled) {
+        if(commentSectionEnabled == null) {
+            commentSectionEnabled = new HashMap<>();
+        }
+        commentSectionEnabled.put(commentID, isEnabled);
+    }
+
+    Boolean getCommentSectionEnabled(String commentID) {
+        if(commentSectionEnabled == null) {
+            commentSectionEnabled = new HashMap<>();
+        }
+        return commentSectionEnabled.get(commentID);
+    }
+
     String getCommentInput(String commentID) {
         if(commentSections == null) {
             commentSections = new HashMap<>();
@@ -61,7 +67,11 @@ class UserInputViewModel extends ViewModel {
         if(imageSelections == null) {
             imageSelections = new HashMap<>();
         }
-        imageSelections.put(itemID, selectedBitmap);
+        if(selectedBitmap != null) {
+            imageSelections.put(itemID, selectedBitmap);
+        } else {
+            imageSelections.remove(itemID);
+        }
     }
 
     Bitmap getBitmap(String itemId) {
